@@ -27,17 +27,28 @@ class FrontendController extends Controller
         return response()->json($response , Response::HTTP_NOT_FOUND);
     }
     public function getDetail($id){
-    	$data['item'] = Product::select('*')->where('prod_id', $id)->first();
-        $data['items'] = Size::select('*')->first();
-    	$data['comments'] = Comment::where('masanpham',$id)->get(); 
-    	return view('frontend.details',$data);
+    	$item = Product::select('*')->where('prod_id', $id)->first();
+        $items = Size::select('*')->first();
+    	$comments = Comment::where('masanpham',$id)->get(); 
+    	// return view('frontend.details',$data);
+        $response = [
+            'item'      => $item,
+            'items'      => $items,
+            'comments'      => $comments,
+        ];
+        return response()->json($response , Response::HTTP_NOT_FOUND);
     }
     public function getCategory($id){
-    	$data['catename'] = Category::select('*')->where('cate_id', $id)->first();
-    	$data['items'] = Product::where('maloaisp',$id)->orderBy('prod_id','desc')->paginate(8);
-    	return view('frontend.category',$data);
+    	$catename = Category::select('*')->where('cate_id', $id)->first();
+    	$items = Product::where('maloaisp',$id)->orderBy('prod_id','desc')->paginate(8);
+    	//return view('frontend.category',$data);
+        $response = [
+            'catename'      => $catename,
+            'items'      => $items,
+        ];
+        return response()->json($response , 200);
     }
-    public function postComment(Request $request,$id){
+    public function postComment(Request $request, $id){
        
     	$comment = new Comment;
     	$comment ->hoten = $request->name;
@@ -45,7 +56,12 @@ class FrontendController extends Controller
     	$comment ->noidung = $request->content;
     	$comment->masanpham = $id;
     	$comment ->save();
-    	return back();
+    	//return back();
+        return response()->json([
+            'status'=> 200,
+            'message'=> 'Comment created successfully',
+            'data'=>$comment
+        ]);
     }
     public function getSearch(Request $request){
     	 $result = $request->result;
