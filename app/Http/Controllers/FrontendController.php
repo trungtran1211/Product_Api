@@ -24,7 +24,7 @@ class FrontendController extends Controller
             'news'      => $news,
             'new'      => $new,
         ];
-        return response()->json($response , Response::HTTP_NOT_FOUND);
+        return response()->json($response);
     }
     public function getDetail($id){
     	$item = Product::select('*')->where('prod_id', $id)->first();
@@ -33,10 +33,10 @@ class FrontendController extends Controller
     	// return view('frontend.details',$data);
         $response = [
             'item'      => $item,
-            'items'      => $items,
-            'comments'      => $comments,
+            'items'     => $items,
+            'comments'  => $comments,
         ];
-        return response()->json($response , Response::HTTP_NOT_FOUND);
+        return response()->json($response , 200);
     }
     public function getCategory($id){
     	$catename = Category::select('*')->where('cate_id', $id)->first();
@@ -48,6 +48,15 @@ class FrontendController extends Controller
         ];
         return response()->json($response , 200);
     }
+
+    public function getCate(){
+        $catename = Category::select('*')->get();
+        $response = [
+            'cate'  => $catename,
+        ];
+        return response()->json($response , 200);
+    }
+
     public function postComment(Request $request, $id){
        
     	$comment = new Comment;
@@ -68,7 +77,7 @@ class FrontendController extends Controller
     	 $data ['keyword'] = $result;
     	 $result = str_replace(' ', '%', $result);
     	 $data['search'] = Product::where('tensanpham','like','%'.$result.'%')->get();
-    	 return view('frontend.search',$data);
+    	 return response()->json($data , 200);
     }
     public function getContact()
     {
@@ -124,5 +133,13 @@ class FrontendController extends Controller
     public function getdeleteyt($id){
         YeuThich::where('id',$id)->delete();
         return back();
+    }
+
+    public function getSlider(){
+        $data = DB::table('slide')->where('trangthai',0)->get();
+        $response = [
+            'slider'      => $data,
+        ];
+        return response()->json($response , 200);
     }
 }

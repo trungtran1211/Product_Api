@@ -17,28 +17,29 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+	Route::group(['prefix' => '/'], function () {
+		Route::get('/', 'FrontendController@getHome')->name('home');//done 
+	});
     //Route::get('/', 'LoginCustomController@getlogincustom');
     Route::post('login1', 'LoginCustomController@postlogincustom');
     Route::get('logout1', 'LoginCustomController@getLogout1');
-    Route::get('userinfo', 'LoginCustomController@getUserInfo');
+    Route::group(['middleware' => 'jwt.auth'], function () {
+		Route::get('user-info', 'LoginCustomController@getUserInfo');
+	});
     Route::post('regrister', 'LoginCustomController@postregrister');
 
-
-    Route::group(['prefix' => '/'], function () {
-		Route::get('/', 'FrontendController@getHome')->name('home');//done
-	    
-	});
 	Route::get('detail/{id}', 'FrontendController@getDetail'); //done
 	Route::post('detail/{id}', 'FrontendController@postComment');
 	Route::get('category/{id}', 'FrontendController@getCategory');
+	Route::get('getcate', 'FrontendController@getCate');
 	Route::get('search','FrontendController@getSearch');
 
 	/*======================================================*/
 	/*Tuyển dụng*/
 	Route::get('gettuyendung', 'FrontendController@getlisttd');
 	/*======================================================*/
-	
+	// Get Slider
+	Route::get('slider', 'FrontendController@getSlider');
 	/*======================================================*/
 	/*Thêm vào yêu thích*/
 	Route::get('addcartyt/{id}','CartController@getAddCartYt');
@@ -57,7 +58,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 	// Route::post('regrister', 'LoginCustomController@postregrister');
 
 	
-	Route::get('signup','LoginCustomController@getSignUp');
+	//Route::get('signup','LoginCustomController@getSignUp');
 	Route::get('contact','FrontendController@getContact');
 	Route::post('checkbills','FrontendController@getCheckBill')->name('checkbill');
 	Route::get('checklistbill','FrontendController@getCheckListBill');
@@ -67,11 +68,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 	/*======================================================*/
 	/*Giỏ hàng*/
 	Route::group(['prefix'=>'cart'],function(){
-		Route::get('add/{id}','CartController@getAddCart');
+		// Route::get('add/{id}','CartController@getAddCart');
 		Route::get('ad/{id}','CartController@getShow');
-		Route::get('show','CartController@getShowCart')->name('show-cart');
+		Route::get('show/{id}','CartController@getShowCart')->name('show-cart');
 		Route::get('delete/{id}','CartController@getDeleteCart');
-		Route::get('update','CartController@getUpdateCart');
+		Route::get('deleteItem/{id}','CartController@getDeleteItemCart');
+		Route::get('update/{id}','CartController@getUpdateCart');
 		Route::post('updatesize','CartController@getUpdateSize');
 		Route::post('show','CartController@postComplete');
 		Route::post('add-cart-ajax','CartController@addCartAjax');

@@ -19,10 +19,11 @@ class LoginCustomController extends Controller
 
 	
 	public function postlogincustom(Request $request){
-         $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password');
         $token = null;
         try {
            if (!$token = JWTAuth::attempt($credentials)) {
+
             return response()->json(['invalid_email_or_password'], 422);
            }
         } catch (JWTAuthException $e) {
@@ -44,13 +45,12 @@ class LoginCustomController extends Controller
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['error' => $validator->messages()], 401);
         }
 
 		//Request is validated, do logout        
         try {
             JWTAuth::invalidate($request->token);
- 
             return response()->json([
                 'success' => true,
                 'message' => 'User has been logged out'

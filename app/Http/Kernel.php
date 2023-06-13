@@ -14,6 +14,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        \App\Http\Middleware\CorsMiddleware::class,
         \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
@@ -38,7 +39,8 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            'throttle:60,1',
+            \Fruitcake\Cors\HandleCors::class,
+            'throttle:5000,1',
             'bindings',
         ],
     ];
@@ -67,7 +69,7 @@ class Kernel extends HttpKernel
         'duyetnguoidung' => \App\Http\Middleware\Checknguoidung::class,
         'cors' => App\Http\Middleware\CORS::class,
         'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class,
-        'jwt.auth' => 'Tymon\JWTAuth\Middleware\GetUserFromToken',
         'jwt.refresh' => 'Tymon\JWTAuth\Middleware\RefreshToken',
+        'jwt.auth' => \App\Http\Middleware\VerifyJWTToken::class,
     ];
 }

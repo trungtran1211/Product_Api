@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Bill;
 use App\Models\BillDetail;
 use App\Models\Users;
+use App\Models\Carts;
 use Mail;
 use Auth;
 use Carbon\Carbon;
@@ -15,63 +16,103 @@ use DB;
 use Illuminate\Support\Facades\Input;
 class CartController extends Controller
 {
-    public function getAddCart($id){
-    	$product = Product::select('*')->where('prod_id', $id)->first();
+    // public function getAddCart($id){
+    // 	$product = Product::select('*')->where('prod_id', $id)->first();
         
-    	Cart::add([
-            'id' => $id,
-            'name' => $product->tensanpham,
-            
-            'qty' => 1,
-            'price' => $product->dongia,
-            'options' => [
-                'img' => $product->hinhanh,
+    // 	Cart::add([
+    //         'id' => $id,
+    //         'name' => $product->tensanpham,
+    //         'qty' => 1,
+    //         'price' => $product->dongia,
+    //         'options' => [
+    //         'img' => $product->hinhanh,
                 
-               
-            ]
-        ]);
-    	return redirect('cart/show');
-    }
+    //         ]
+    //     ]);
+    // 	return redirect('cart/show');
+    // }
 
     public function getShow($id){
         $product = Product::select('*')->where('prod_id', $id)->first();
+        $cartItem = Carts::where('prod_id', $id)->first();
+        if ($cartItem) {
+            $cartItem->cart_qty += 1;
+            $test = $cartItem->cart_qty;
+            $cartItem-> tongtien = $product->dongia * $test;
+            $cartItem->save();
+        } else {
+            $cartItem = new Carts();
+            $cartItem->mand = 5;
+            $cartItem->prod_id = $id;
+            $cartItem->prod_name = $product->tensanpham;
+            $cartItem->cart_qty = 1;
+            $test = $cartItem->cart_qty;
+            $cartItem->dongia = $product->dongia;
+            $cartItem-> tongtien = $product->dongia * $test;
+            $cartItem->hinhanh = $product->hinhanh;
+            $cartItem->size = 37;
+            $cartItem->save();
+        } 
         Cart::add([
             'id' => $id,  
             'name' => $product->tensanpham,
             'qty' => 1, 
-            
             'price' => $product->dongia, 
             'options' => [
                 'img' => $product->hinhanh,
                 'size' => 37,   
             ]
         ]);
-
-        return redirect()->back();
+           
+        return response()->json([
+            'status'=> 200,
+            'message'=> 'Dữ liệu đã được lưu',  
+        ]);
     }
-    public function getShowCart(){
-    	$data['total'] = Cart::total();
-    	$data['items'] = Cart::content();
     
-    	return view('frontend.cart',$data);
+    public function getShowCart($id){
+    	$cartItems = Carts::where('mand', $id)->get();
+        $count = Carts::where('mand', $id)->count();
+        $response = [
+            'cartItems' => $cartItems,
+            'count' => $count
+        ];
+    	return response()->json($response, 200);
     }
-    public function getDeleteCart($id){
-        if ($id=='all') {
-            Cart::destroy();
-        }else{
-            Cart::remove($id);
-        }
-        return back();
-    }
-    public function getUpdateCart(Request $request){
-        /*$qty = DB::table('kichcosp')->where([['masp',$request->id],['makc',$request->size]])->first();
-        if ($qty->soluong > $request->qty) {
-            return redirect()->back()->with('mess',"<script type='text/javascript'>alert('khong du')</script>");
-        }else{*/
-            Cart::update($request->rowId,$request->qty);   
-        /*}*/
-        
 
+    public function getDeleteCart($id){
+        Carts::where('mand', $id)->delete();
+        return response()->json([
+            'status'=> 200,
+            'message'=> 'Xoá thành công giỏ hàng',  
+        ]);
+    }
+
+    public function getDeleteItemCart($id) {
+        Carts::where('cart_id', $id)->delete();
+        return response()->json([
+            'status'=> 200,
+            'message'=> 'Xoá thành công sản phẩm',  
+        ]);
+    }
+
+    public function getUpdateCart($id, Request $request){
+        $cartItem = Carts::where('cart_id', $id);
+        if ($cartItem) {
+            $cartItem->cart_qty = $qty;
+            $cartItem->tongtien = $cartItem->price * $qty; 
+            $cartItem->save();
+            
+            return response()->json([
+                'status' => 200,
+                'message' => 'Cập nhật thành công'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Sản phẩm không tồn tại trong giỏ hàng'
+            ]);
+        }
     }
      
     public function postComplete(Request $request){

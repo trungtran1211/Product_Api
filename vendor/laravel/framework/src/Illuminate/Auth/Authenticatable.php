@@ -2,10 +2,8 @@
 
 namespace Illuminate\Auth;
 
-
 trait Authenticatable
 {
-    
     /**
      * The column name of the "remember me" token.
      *
@@ -87,5 +85,4 @@ trait Authenticatable
     {
         return $this->rememberTokenName;
     }
-    
 }
