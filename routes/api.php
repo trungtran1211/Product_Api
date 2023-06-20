@@ -69,7 +69,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 	/*Giỏ hàng*/
 	Route::group(['prefix'=>'cart'],function(){
 		// Route::get('add/{id}','CartController@getAddCart');
-		Route::get('ad/{id}','CartController@getShow');
+		Route::post('ad/{id}','CartController@getShow');
 		Route::get('show/{id}','CartController@getShowCart')->name('show-cart');
 		Route::get('delete/{id}','CartController@getDeleteCart');
 		Route::get('deleteItem/{id}','CartController@getDeleteItemCart');

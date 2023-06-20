@@ -32,7 +32,7 @@ class CartController extends Controller
     // 	return redirect('cart/show');
     // }
 
-    public function getShow($id){
+    public function getShow($id, Request $request){
         $product = Product::select('*')->where('prod_id', $id)->first();
         $cartItem = Carts::where('prod_id', $id)->first();
         if ($cartItem) {
@@ -42,7 +42,7 @@ class CartController extends Controller
             $cartItem->save();
         } else {
             $cartItem = new Carts();
-            $cartItem->mand = 5;
+            $cartItem->mand = $request->mand;
             $cartItem->prod_id = $id;
             $cartItem->prod_name = $product->tensanpham;
             $cartItem->cart_qty = 1;
