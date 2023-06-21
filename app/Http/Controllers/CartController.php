@@ -35,40 +35,44 @@ class CartController extends Controller
     public function getShow($id, Request $request){
         $product = Product::select('*')->where('prod_id', $id)->first();
         $cartItem = Carts::where('prod_id', $id)->first();
+        $data = $request->all();
+    
         if ($cartItem) {
             $cartItem->cart_qty += 1;
             $test = $cartItem->cart_qty;
-            $cartItem-> tongtien = $product->dongia * $test;
+            $cartItem->tongtien = $product->dongia * $test;
             $cartItem->save();
         } else {
             $cartItem = new Carts();
-            $cartItem->mand = $request->mand;
+            $cartItem->mand = 5;
             $cartItem->prod_id = $id;
             $cartItem->prod_name = $product->tensanpham;
             $cartItem->cart_qty = 1;
             $test = $cartItem->cart_qty;
             $cartItem->dongia = $product->dongia;
-            $cartItem-> tongtien = $product->dongia * $test;
+            $cartItem->tongtien = $product->dongia * $test;
             $cartItem->hinhanh = $product->hinhanh;
             $cartItem->size = 37;
             $cartItem->save();
-        } 
+        }
+    
         Cart::add([
-            'id' => $id,  
+            'id' => $id,
             'name' => $product->tensanpham,
-            'qty' => 1, 
-            'price' => $product->dongia, 
+            'qty' => 1,
+            'price' => $product->dongia,
             'options' => [
                 'img' => $product->hinhanh,
-                'size' => 37,   
+                'size' => 37,
             ]
         ]);
-           
+    
         return response()->json([
-            'status'=> 200,
-            'message'=> 'Dữ liệu đã được lưu',  
+            'status' => 200,
+            'message' => 'Dữ liệu đã được lưu',
         ]);
     }
+    
     
     public function getShowCart($id){
     	$cartItems = Carts::where('mand', $id)->get();
